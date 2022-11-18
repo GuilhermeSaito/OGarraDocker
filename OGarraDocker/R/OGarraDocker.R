@@ -134,6 +134,8 @@ CreateSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", fieldsName) 
 #'
 #' @export
 InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", id, nome, data) {
+# ---------------------------- SOH PRECISA COLOCAR OS PARAMETROS PARA OS VALORES CERTINHOS ----------------------------
+
 	# Setando o diretorio para conseguir utilizar o que eu preciso
 	setwd("C:\\Users\\guilh\\Desktop\\aulasUTFPR\\2022_2\\Oficina1\\OGarraDocker\\OGarraDocker/database")
 
@@ -169,26 +171,42 @@ InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", id, nome, da
 #' @details
 #' * 1. Para obter informações a respeito do código R desta função, acessar ...
 #'
+#' @import jsonlite
+#' 
 #' @examples
 #' GetAllSQLiteData()
 #'
 #' @export
 GetAllSQLiteData <- function(dataTableName = "OGarraDockerDB") {
-	if (!file.exists(paste0(dirname(rstudioapi::getSourceEditorContext()$path), "/", dataTableName, ".db"))) {
-		dir.create(paste0(dirname(rstudioapi::getSourceEditorContext()$path), "/", dataTableName, ".db"), recursive = T)
+	# Setando o diretorio para conseguir utilizar o que eu preciso
+	setwd("C:\\Users\\guilh\\Desktop\\aulasUTFPR\\2022_2\\Oficina1\\OGarraDocker\\OGarraDocker/database")
+
+	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
+		return(0)
 	}
-
+	
 	# Faz a conxao com a base de dados
-	con <- DBI::dbConnect(RSQLite::SQLite(), paste0(dirname(rstudioapi::getSourceEditorContext()$path), "/", dataTableName))
+	con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
 
-	data <- dplyr::tbl(con, dataTableName)
+	query <- paste0("SELECT * FROM ", dataTableName)
+	data <- DBI::dbGetQuery(con, query)
+	# data <- dplyr::tbl(con, dataTableName)
 
 	return(data)
+	# print(dim(data)[2])
+
+	# if (dim(data)[2] > 0) {
+	# 	dataJson <- jsonlite::toJSON(data, pretty = TRUE)
+	# 	return(dataJson)
+	# }
+	# else {
+	# 	return(-1)
+	# }
 
 	# Nao pode encerrar a conexao aqui hahahaha
 	DBI::dbDisconnect(con)
 }
-
+GetAllSQLiteData()
 #' @title
 #' Remove row from DataBase SQLite Connection.
 #'

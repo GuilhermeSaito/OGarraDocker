@@ -21,6 +21,6 @@ Essa função insere registros em uma tabela no tipo de sqlite
 * 1. Para obter informações a respeito do código R desta função, acessar ...
 }
 \examples{
-InsertSQLiteDataTable(as.data.frame(list(id = c("1", "2", "3"), name = c("a", "b", "c"), data = c("12-10-2022", "10-4-1992", "25-4-2001"))))
+InsertSQLiteDataTable(id = "1", nome = "Teste", data = "10-20-32")
 
 }
