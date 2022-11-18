@@ -19,7 +19,8 @@ package.check <- lapply(
 )
 
 # local de trabalho
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+setwd("/home/gtsaito/Desktop/Gui/Oficinas1/OGarraDocker")
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
 
 # documenta

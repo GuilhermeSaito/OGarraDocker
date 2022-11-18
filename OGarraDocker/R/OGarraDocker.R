@@ -1,4 +1,62 @@
 # ------------------------- Provavelmente nao vai precisar usar essa funcao de criar a tabela, ja q ela ja cria quando insere, mas vai ficar ai soh de backup
+#' @title
+#' Remover Acentos
+#'
+#' @description
+#' Esta funcao remove acentos da string recebida e retorna a mesma string sem os mesmos e tudo minusculo.
+#'
+#' @param x string recebida normal
+#'
+#' @return Retorna a mesma string mas sem os acentos e tudo minusculo
+#'
+#' @details
+#' * 1. Para obter informações a respeito do código R desta função, acessar o link: http://opencpu.mppr/ocpu/library/GeoEmpresas/R/util_remove_accents/print
+#'
+#' @examples
+#' util_remove_accents("Coração")
+#'
+#' @export
+util_remove_accents <- function(x = "") {
+  	y <- iconv(tolower(x), from = "UTF-8", to = "ASCII//TRANSLIT")
+  
+  	return(y)
+}
+
+#' @title
+#' Remover caracteres especiais
+#'
+#' @description
+#' Esta funcao remove caracteres especiais de string para conseguir processa-la de forma correta
+#'
+#' @param x string recebida com todos os caracteres
+#'
+#' @return Retorna a mesma string mas sem os caracteres especiais
+#'
+#' @details
+#' * 1. Para obter informações a respeito do código R desta função, acessar o link: http://opencpu.mppr/ocpu/library/GeoEmpresas/R/util_remove_special_characters/print
+#' 
+#' @examples
+#' util_remove_special_characters("Avenida das Torres")
+#' util_remove_special_characters("Avenida-das-Torres")
+#'
+#' @export
+util_remove_special_characters <- function(x = "") {
+	y <- gsub(
+		"\\s+", "",
+		gsub(
+		"[!\"#$%&'()\\*\\+,/:<=>?@\\^_`\\{|\\}~]", "",
+		gsub(
+			"\\.", "",
+			gsub(
+			"/", "",
+			gsub("-", "", x)
+			)
+		)
+		)
+	)
+
+  return(y)
+}
 
 #' @title
 #' Create DataBase SQLite Connection.
@@ -23,27 +81,38 @@
 #' * 1. Para obter informações a respeito do código R desta função, acessar ...
 #'
 #' @examples
-#' CreateSQLiteDataTable(fieldsName = c("id", "nome", "data"))
+#' CreateSQLiteDataTable(fieldsName = "id; nome; data"))
 #'
 #' @export
 CreateSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", fieldsName) {
-    # Soh alterar aqui depois para colocar o local certinho
-    setwd("/home/gtsaito/Desktop/Gui/Oficinas1")
+	# Soh alterar aqui depois para colocar o local certinho, aterar para colocar o path do meu pc
+	setwd("/home/gtsaito/Desktop/Gui/Oficinas1/OGarraDocker/OGarraDocker/database")
 
-    if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
-        return(0)
-    }
+	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
+		return(0)
+	}
 
-    # Faz a conxao com a base de dados e cria a tabela, se nao existir
-    con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
+	# Faz a conxao com a base de dados e cria a tabela, se nao existir
+	con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
 
-    # O dado para ser inserido na tabela precisa ser do tipo de data frame ou vector
-    if ((!is.data.frame(fieldsName)) & (!is.vector(fieldsName))) {
-        fieldsName <- as.data.frame(fieldsName)
-    }
+	# Considerando que o fields name vai vir com ;
+	fieldsNameList <- trimws(strsplit(fieldsName, ";")[[1]])
+	# Remove todos os . - ou outros characteres especiais dos cnpjs
+	fieldsNameList <- OGarraDocker::util_remove_special_characters(fieldsNameList)
 
-    # Cria a tabela e retorna o valor do resultado, se nao for possivel criar, vai ser retornado o valor
-    return(DBI::dbCreateTable(conn = con, name = dataTableName, fields = fieldsName, temporary = FALSE))
+	# O dado para ser inserido na tabela precisa ser do tipo de data frame ou vector
+	if (length(fieldsNameList) == 0) {
+		return (-1)
+	}
+	
+	# Cria um dataframe vazio sem linha e com a mesma quantidade de colunas
+	fieldsNameDataFrame <- data.frame(matrix(NA, nrow = 0, ncol = length(fieldsNameList)))
+	# Coloca o nome das colunas
+	colnames(fieldsNameDataFrame) <- fieldsNameList
+
+	# Cria a tabela e retorna o valor do resultado, se nao for possivel criar, vai ser retornado o valor
+	result <- DBI::dbCreateTable(conn = con, name = dataTableName, fields = fieldsNameDataFrame, temporary = FALSE)
+	return(result)
 }
 
 #' @title
@@ -65,25 +134,25 @@ CreateSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", fieldsName) 
 #'
 #' @export
 InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", dataToInsert) {
-    if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
-        return(0)
-    }
+	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
+		return(0)
+	}
 
-    # Faz a conxao com a base de dados e cria a tabela, se nao existir
-    con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
+	# Faz a conxao com a base de dados e cria a tabela, se nao existir
+	con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
 
-    # O dado para ser inserido na tabela precisa ser do tipo de data frame
-    if (!is.data.frame(dataToInsert)) {
-        dataToInsert <- as.data.frame(dataToInsert)
-    }
+	# O dado para ser inserido na tabela precisa ser do tipo de data frame
+	if (!is.data.frame(dataToInsert)) {
+		dataToInsert <- as.data.frame(dataToInsert)
+	}
 
-    # Escreve na tabela que fez a conexao
-    DBI::dbWriteTable(conn = con, dataTableName, dataToInsert, append = TRUE)
+	# Escreve na tabela que fez a conexao
+	DBI::dbWriteTable(conn = con, dataTableName, dataToInsert, append = TRUE)
 
-    # Encerra a conexao
-    DBI::dbDisconnect(con)
+	# Encerra a conexao
+	DBI::dbDisconnect(con)
 
-    return(1)
+	return(1)
 }
 
 #' @title
@@ -104,19 +173,19 @@ InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", dataToInsert
 #'
 #' @export
 GetAllSQLiteData <- function(dataTableName = "OGarraDockerDB") {
-    if (!file.exists(paste0(dirname(rstudioapi::getSourceEditorContext()$path), "/", dataTableName, ".db"))) {
-        dir.create(paste0(dirname(rstudioapi::getSourceEditorContext()$path), "/", dataTableName, ".db"), recursive = T)
-    }
+	if (!file.exists(paste0(dirname(rstudioapi::getSourceEditorContext()$path), "/", dataTableName, ".db"))) {
+		dir.create(paste0(dirname(rstudioapi::getSourceEditorContext()$path), "/", dataTableName, ".db"), recursive = T)
+	}
 
-    # Faz a conxao com a base de dados
-    con <- DBI::dbConnect(RSQLite::SQLite(), paste0(dirname(rstudioapi::getSourceEditorContext()$path), "/", dataTableName))
+	# Faz a conxao com a base de dados
+	con <- DBI::dbConnect(RSQLite::SQLite(), paste0(dirname(rstudioapi::getSourceEditorContext()$path), "/", dataTableName))
 
-    data <- dplyr::tbl(con, dataTableName)
+	data <- dplyr::tbl(con, dataTableName)
 
-    return(data)
+	return(data)
 
-    # Nao pode encerrar a conexao aqui hahahaha
-    DBI::dbDisconnect(con)
+	# Nao pode encerrar a conexao aqui hahahaha
+	DBI::dbDisconnect(con)
 }
 
 #' @title
@@ -138,20 +207,20 @@ GetAllSQLiteData <- function(dataTableName = "OGarraDockerDB") {
 #'
 #' @export
 RemoveSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", idToRemove) {
-    if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
-        return(0)
-    }
+	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
+		return(0)
+	}
 
-    # Faz a conxao com a base de dados e cria a tabela, se nao existir
-    con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
+	# Faz a conxao com a base de dados e cria a tabela, se nao existir
+	con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
 
-    # Prepara a query para ser executada
-    query <- paste0("DELETE FROM ", dataTableName, " WHERE id = ", as.character(idToRemove))
+	# Prepara a query para ser executada
+	query <- paste0("DELETE FROM ", dataTableName, " WHERE id = ", as.character(idToRemove))
 
-    # Escreve na tabela que fez a conexao
-    DBI::dbSendQuery(conn = con, statement = query)
+	# Escreve na tabela que fez a conexao
+	DBI::dbSendQuery(conn = con, statement = query)
 
-    return(1)
+	return(1)
 }
 
 #' @title
@@ -173,23 +242,23 @@ RemoveSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", idToRemove) 
 #'
 #' @export
 RetrieveSQLiteData <- function(dataTableName = "OGarraDockerDB", idToRetrieve) {
-    if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
-        return(0)
-    }
+	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
+		return(0)
+	}
 
-    # Faz a conxao com a base de dados
-    con <- DBI::dbConnect(RSQLite::SQLite(), dataTableName)
+	# Faz a conxao com a base de dados
+	con <- DBI::dbConnect(RSQLite::SQLite(), dataTableName)
 
-    # Prepara a query para ser executada
-    query <- paste0("SELECT * FROM ", dataTableName, " WHERE id = ", idToRetrieve)
+	# Prepara a query para ser executada
+	query <- paste0("SELECT * FROM ", dataTableName, " WHERE id = ", idToRetrieve)
 
-    query_response <- DBI::dbSendQuery(conn = con, statement = query)
-    # Retorna os dados da ultima query feita
-    data <- DBI::dbFetch(query_response)
+	query_response <- DBI::dbSendQuery(conn = con, statement = query)
+	# Retorna os dados da ultima query feita
+	data <- DBI::dbFetch(query_response)
 
-    # ------------------------------ NAO ESQUECER DE COLOCAR O NAMESPACE AQUI ------------------------------
-    # Remove os registros resgatados
-    RemoveSQLiteDataTable(idToRemove = idToRetrieve)
+	# ------------------------------ NAO ESQUECER DE COLOCAR O NAMESPACE AQUI ------------------------------
+	# Remove os registros resgatados
+	RemoveSQLiteDataTable(idToRemove = idToRetrieve)
 
-    return(data)
+	return(data)
 }
