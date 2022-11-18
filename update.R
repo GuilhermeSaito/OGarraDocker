@@ -19,8 +19,8 @@ package.check <- lapply(
 )
 
 # local de trabalho
-setwd("/home/gtsaito/Desktop/Gui/Oficinas1/OGarraDocker")
-# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+# setwd("/home/gtsaito/Desktop/Gui/Oficinas1/OGarraDocker")
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 getwd()
 
 # documenta
@@ -28,6 +28,9 @@ devtools::document(pkg = './OGarraDocker')
 
 # build
 devtools::build(pkg = './OGarraDocker', path = './source/')
+
+# Se der o erro "package ‘OGarraDocker’ is in use and will not be installed"
+detach("package:OGarraDocker", unload = TRUE)
 
 # instalação para testes
 withr::with_libpaths(new = .libPaths()[1], install.packages('./source/OGarraDocker_0.1.0.tar.gz', type='source', repos = NULL))

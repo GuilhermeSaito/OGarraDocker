@@ -85,8 +85,8 @@ util_remove_special_characters <- function(x = "") {
 #'
 #' @export
 CreateSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", fieldsName) {
-	# Soh alterar aqui depois para colocar o local certinho, aterar para colocar o path do meu pc
-	setwd("/home/gtsaito/Desktop/Gui/Oficinas1/OGarraDocker/OGarraDocker/database")
+	# Setando o diretorio para conseguir utilizar o que eu preciso
+	setwd("C:\\Users\\guilh\\Desktop\\aulasUTFPR\\2022_2\\Oficina1\\OGarraDocker\\OGarraDocker/database")
 
 	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
 		return(0)
@@ -114,7 +114,7 @@ CreateSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", fieldsName) 
 	result <- DBI::dbCreateTable(conn = con, name = dataTableName, fields = fieldsNameDataFrame, temporary = FALSE)
 	return(result)
 }
-
+# CreateSQLiteDataTable(fieldsName = "id; nome; data")
 #' @title
 #' Insert in DataBase SQLite Connection.
 #'
@@ -130,10 +130,13 @@ CreateSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", fieldsName) 
 #' * 1. Para obter informações a respeito do código R desta função, acessar ...
 #'
 #' @examples
-#' InsertSQLiteDataTable(as.data.frame(list(id = c("1", "2", "3"), name = c("a", "b", "c"), data = c("12-10-2022", "10-4-1992", "25-4-2001"))))
+#' InsertSQLiteDataTable(id = "1", nome = "Teste", data = "10-20-32")
 #'
 #' @export
-InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", dataToInsert) {
+InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", id, nome, data) {
+	# Setando o diretorio para conseguir utilizar o que eu preciso
+	setwd("C:\\Users\\guilh\\Desktop\\aulasUTFPR\\2022_2\\Oficina1\\OGarraDocker\\OGarraDocker/database")
+
 	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
 		return(0)
 	}
@@ -141,10 +144,8 @@ InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", dataToInsert
 	# Faz a conxao com a base de dados e cria a tabela, se nao existir
 	con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
 
-	# O dado para ser inserido na tabela precisa ser do tipo de data frame
-	if (!is.data.frame(dataToInsert)) {
-		dataToInsert <- as.data.frame(dataToInsert)
-	}
+	# Preparando o dado como data frame para inserir, vai inserir o dado mesmo que esteja null
+	dataToInsert <- data.frame(id = id, nome = nome, data = data)
 
 	# Escreve na tabela que fez a conexao
 	DBI::dbWriteTable(conn = con, dataTableName, dataToInsert, append = TRUE)

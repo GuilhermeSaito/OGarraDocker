@@ -4,7 +4,7 @@
 \alias{InsertSQLiteDataTable}
 \title{Insert in DataBase SQLite Connection.}
 \usage{
-InsertSQLiteDataTable(dataTableName = "OGarraDockerDB", dataToInsert)
+InsertSQLiteDataTable(dataTableName = "OGarraDockerDB", id, nome, data)
 }
 \arguments{
 \item{dataTableName}{Nome da tabela a fazer a conexão. Por padrão = "OGarraDockerDB"}
