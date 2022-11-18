@@ -18,7 +18,7 @@
 #' @export
 util_remove_accents <- function(x = "") {
   	y <- iconv(tolower(x), from = "UTF-8", to = "ASCII//TRANSLIT")
-  
+
   	return(y)
 }
 
@@ -34,7 +34,7 @@ util_remove_accents <- function(x = "") {
 #'
 #' @details
 #' * 1. Para obter informações a respeito do código R desta função, acessar o link: http://opencpu.mppr/ocpu/library/GeoEmpresas/R/util_remove_special_characters/print
-#' 
+#'
 #' @examples
 #' util_remove_special_characters("Avenida das Torres")
 #' util_remove_special_characters("Avenida-das-Torres")
@@ -104,7 +104,7 @@ CreateSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", fieldsName) 
 	if (length(fieldsNameList) == 0) {
 		return (-1)
 	}
-	
+
 	# Cria um dataframe vazio sem linha e com a mesma quantidade de colunas
 	fieldsNameDataFrame <- data.frame(matrix(NA, nrow = 0, ncol = length(fieldsNameList)))
 	# Coloca o nome das colunas
@@ -171,8 +171,6 @@ InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", id, nome, da
 #' @details
 #' * 1. Para obter informações a respeito do código R desta função, acessar ...
 #'
-#' @import jsonlite
-#' 
 #' @examples
 #' GetAllSQLiteData()
 #'
@@ -184,39 +182,29 @@ GetAllSQLiteData <- function(dataTableName = "OGarraDockerDB") {
 	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
 		return(0)
 	}
-	
+
 	# Faz a conxao com a base de dados
 	con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
 
 	query <- paste0("SELECT * FROM ", dataTableName)
 	data <- DBI::dbGetQuery(con, query)
-	# data <- dplyr::tbl(con, dataTableName)
 
 	return(data)
-	# print(dim(data)[2])
-
-	# if (dim(data)[2] > 0) {
-	# 	dataJson <- jsonlite::toJSON(data, pretty = TRUE)
-	# 	return(dataJson)
-	# }
-	# else {
-	# 	return(-1)
-	# }
 
 	# Nao pode encerrar a conexao aqui hahahaha
 	DBI::dbDisconnect(con)
 }
-GetAllSQLiteData()
+
 #' @title
-#' Remove row from DataBase SQLite Connection.
+#' Remove row from DataBase SQLite Connection and return the row that was removed.
 #'
 #' @description
-#' Essa função remove registros de tabela no tipo de sqlite
+#' Essa função remove registros de tabela no tipo de sqlite e a retorna para o chamamento
 #'
 #' @param dataTableName Nome da tabela a fazer a conexão. Por padrão = "OGarraDockerDB"
 #' @param idToRemove Id correspondente para remover o registro
 #'
-#' @return Retorna verdadeiro caso foi possível a remoção na tabela ou false, caso o contrário
+#' @return Retorna o dado removido
 #'
 #' @details
 #' * 1. Para obter informações a respeito do código R desta função, acessar ...
@@ -225,59 +213,25 @@ GetAllSQLiteData()
 #' RemoveSQLiteDataTable(idToRemove = 1)
 #'
 #' @export
-RemoveSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", idToRemove) {
-	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
-		return(0)
-	}
+RetrieveRemoveSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", idToRemove) {
+	# Setando o diretorio para conseguir utilizar o que eu preciso
+	setwd("C:\\Users\\guilh\\Desktop\\aulasUTFPR\\2022_2\\Oficina1\\OGarraDocker\\OGarraDocker/database")
 
-	# Faz a conxao com a base de dados e cria a tabela, se nao existir
-	con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
-
-	# Prepara a query para ser executada
-	query <- paste0("DELETE FROM ", dataTableName, " WHERE id = ", as.character(idToRemove))
-
-	# Escreve na tabela que fez a conexao
-	DBI::dbSendQuery(conn = con, statement = query)
-
-	return(1)
-}
-
-#' @title
-#' Retrieve data from DataBase SQLite Connection.
-#'
-#' @description
-#' Essa função resgata os registros em que os ids forem iguais ao passado por parametro, deleta-os e retorna eles
-#'
-#' @param dataTableName Nome da tabela a ser pego as informações. Por padrão = "OGarraDockerDB"
-#' @param idToRetrieve Id correspondente para retirar do registro
-#'
-#' @return Retorna um json contendo as informações do banco pedidas
-#'
-#' @details
-#' * 1. Para obter informações a respeito do código R desta função, acessar ...
-#'
-#' @examples
-#' GetAllSQLiteData(idToRetrieve = 1)
-#'
-#' @export
-RetrieveSQLiteData <- function(dataTableName = "OGarraDockerDB", idToRetrieve) {
 	if (!DBI::dbCanConnect(RSQLite::SQLite(), dbname = dataTableName)) {
 		return(0)
 	}
 
 	# Faz a conxao com a base de dados
-	con <- DBI::dbConnect(RSQLite::SQLite(), dataTableName)
+	con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
+
+	queryToRetrieve <- paste0("SELECT * FROM ", dataTableName, " WHERE id = ", idToRemove)
+	dataRetrieved <- DBI::dbGetQuery(con, queryToRetrieve)
 
 	# Prepara a query para ser executada
-	query <- paste0("SELECT * FROM ", dataTableName, " WHERE id = ", idToRetrieve)
+	query <- paste0("DELETE FROM ", dataTableName, " WHERE id = ", idToRemove)
 
-	query_response <- DBI::dbSendQuery(conn = con, statement = query)
-	# Retorna os dados da ultima query feita
-	data <- DBI::dbFetch(query_response)
+	# Escreve na tabela que fez a conexao
+	DBI::dbSendQuery(conn = con, statement = query)
 
-	# ------------------------------ NAO ESQUECER DE COLOCAR O NAMESPACE AQUI ------------------------------
-	# Remove os registros resgatados
-	RemoveSQLiteDataTable(idToRemove = idToRetrieve)
-
-	return(data)
+	return(dataRetrieved)
 }
