@@ -1,0 +1,17 @@
+------------------------------------------------------------------------------------------------
+PINAGEM:
+
+
+CI:
+PIN 1 - PIN 13 do ARDUINO
+PIN 2 - PIN 12 do ARDUINO
+PIN 3 - PIN 3 do ARDUINO
+PIN 4 - PIN 2 do ARDUINO
+PIN 8 - GND
+PIN 9 - VCC
+PIN 13 - FIO AZUL ESCURO DO MOTOR
+PIN 14 - FIO AMARELO DO MOTOR
+PIN 15 - FIO LILAS DO MOTOR
+PIN 16 - FIO LARANJA DO MOTOR
+
+FIO VERMELHO DO MOTOR - VCC5
