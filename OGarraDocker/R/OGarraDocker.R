@@ -133,7 +133,7 @@ CreateSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", fieldsName) 
 #' InsertSQLiteDataTable(id = "1", nome = "Teste", data = "10-20-32")
 #'
 #' @export
-InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", id, nome, data) {
+InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", id, prioridade, dataEntrada, posLinha, posColuna) {
 # ---------------------------- SOH PRECISA COLOCAR OS PARAMETROS PARA OS VALORES CERTINHOS ----------------------------
 
 	# Setando o diretorio para conseguir utilizar o que eu preciso
@@ -147,7 +147,7 @@ InsertSQLiteDataTable <- function(dataTableName = "OGarraDockerDB", id, nome, da
 	con <- DBI::dbConnect(RSQLite::SQLite(), dbname = dataTableName)
 
 	# Preparando o dado como data frame para inserir, vai inserir o dado mesmo que esteja null
-	dataToInsert <- data.frame(id = id, nome = nome, data = data)
+	dataToInsert <- data.frame(id = id, prioridade = prioridade, dataEntrada = dataEntrada, posLinha = posLinha, posColuna = posColuna)
 
 	# Escreve na tabela que fez a conexao
 	DBI::dbWriteTable(conn = con, dataTableName, dataToInsert, append = TRUE)
