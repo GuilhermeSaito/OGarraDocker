@@ -161,6 +161,8 @@ void show_container_priority() {
 void set_container_priority() {
 	if ((analogRead(0)) < 800) { // SELECT
 		selected = 2;
+
+		// Aqui da para colocar uma funcao que vai chamar a api e colocar ai, mas vai ter q ver a posicao em que vai estar o container
 	}
 	else if ((analogRead(0)) < 200) { // UP
 		prioridade_container = prioridade_container + 1;
