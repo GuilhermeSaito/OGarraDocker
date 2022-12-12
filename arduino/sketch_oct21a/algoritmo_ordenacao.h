@@ -66,9 +66,9 @@ int patio_cheio(Stack** p) {
 int can_add_container(Stack** p) {
     // j =  colunas, i = linhas
     for (int j = 1; j < 5; j++) {
-        for (int i = 2; i < stack->capacity; i++) {
-            if (p[i - 1][j] < p[i][j]) {
-                printf("Nao foi possivel inserir o container")
+        for (int i = 2; i < p[j]->capacity; i++) {
+            if (p[i - 1][j].array[i] < p[i][j].array[i]) {
+                printf("Nao foi possivel inserir o container");
 
                 return 0;   // Nao pode inserir o container
             }

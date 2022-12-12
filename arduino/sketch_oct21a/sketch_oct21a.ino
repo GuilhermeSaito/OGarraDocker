@@ -9,7 +9,7 @@ Servo myservo;
 int pos = 0;    // variable to store the servo position
 int claw = 0;
 
-// Para entrar na aplicacao, deve apertar no botao selecionado primeiro
+// Para entrar na aplicacao
 /*
 	-1 - Nao foi apertado o botao select de inicial
 	1 - Foi apertado o botao e entrara na parte de selecionar a prioridade do container
@@ -281,7 +281,7 @@ void add_remove_container() {
 // Funcao que vai preparar a esturura de dados para o algoritmo, caso seja escolhido o modo automatico
 void add_container_algorithm() {
 	// Cria o patio (matriz) de 4 linhas e 5 colunas
-	pilha** patio[4][5];
+	struct Stack** patio = (struct Stack**)malloc(sizeof(struct Stack*) * 5);
 
     for (int i = 0; i < 5; i++)
         patio[i] = createStack(4); //cria pilhas de altura 4
@@ -307,7 +307,7 @@ void add_container_algorithm() {
 // Funcao que vai preparar a esturura de dados para o algoritmo, caso seja escolhido o modo automatico
 void remove_container_algorithm() {
 	// Cria o patio (matriz) de 4 linhas e 5 colunas
-	pilha** patio[4][5];
+	struct Stack** patio = (struct Stack**)malloc(sizeof(struct Stack*) * 5);
 
     for (int i = 0; i < 5; i++)
         patio[i] = createStack(4); //cria pilhas de altura 4
@@ -355,7 +355,7 @@ void loop() {
 		}
 		// Remove o container selecionado 
 		else if (select_add_remove_container == 3)
-			rm_container();
+			remove_container_algorithm();
 	}
 	// Executar no modo Manual
 	// Prioridade do container setar e usuario pode operar a garra
